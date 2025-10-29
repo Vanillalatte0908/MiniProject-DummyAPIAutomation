@@ -1,0 +1,23 @@
+{
+  "name": "apiautomationdummy",
+  "version": "1.0.0",
+  "description": "apiautomation",
+  "homepage": "https://github.com/Vanillalatte0908/MiniProject-DummyAPIAutomation#readme",
+  "bugs": {
+    "url": "https://github.com/Vanillalatte0908/MiniProject-DummyAPIAutomation/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vanillalatte0908/MiniProject-DummyAPIAutomation.git"
+  },
+  "license": "ISC",
+  "author": "Refqi hussein",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
