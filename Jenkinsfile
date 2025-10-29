@@ -1,28 +1,18 @@
 pipeline {
   agent any
 
-  environment {
-    NODE_VERSION = '18'
-  }
-
   stages {
     stage('Checkout') {
       steps {
-        echo 'Cloning repository...'
         checkout scm
       }
     }
 
-    stage('Install Node.js') {
+    stage('Setup Node.js') {
       steps {
-        echo "Using Node.js version ${NODE_VERSION}"
         sh '''
-          # Install Node if not available
-          if ! command -v node &> /dev/null; then
-            curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
-            apt-get install -y nodejs
-          fi
-          node -v
+          echo "Checking Node.js version..."
+          node -v || (curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs)
           npm -v
         '''
       }
@@ -30,28 +20,29 @@ pipeline {
 
     stage('Install Dependencies') {
       steps {
-        echo 'Installing dependencies...'
-        sh 'npm ci || npm install'
+        sh '''
+          echo "Installing project dependencies..."
+          npm ci || npm install
+        '''
       }
     }
 
     stage('Install Playwright Browsers') {
       steps {
-        echo 'Installing Playwright browsers...'
         sh 'npx playwright install --with-deps'
       }
     }
 
-    stage('Run Tests') {
+    stage('Run API Test') {
       steps {
-        echo 'Running Playwright tests...'
+        echo 'Running specific test file with Playwright...'
+        // 👇 Replace "test.js" with your actual file name
         sh 'npx playwright test --reporter=line'
       }
     }
 
-    stage('Publish Report') {
+    stage('Generate Report') {
       steps {
-        echo 'Generating Playwright HTML report...'
         sh 'npx playwright show-report || true'
       }
     }
@@ -59,14 +50,7 @@ pipeline {
 
   post {
     always {
-      echo 'Archiving test reports...'
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
-    }
-    failure {
-      echo 'Build failed — check logs or reports.'
-    }
-    success {
-      echo '✅ All tests passed!'
     }
   }
 }
